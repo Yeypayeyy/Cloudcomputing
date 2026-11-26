@@ -1,161 +1,145 @@
 <!DOCTYPE html>
-<html><head><meta charset="utf-8"><title>Inventory API Architecture</title>
+<html><head><meta charset="utf-8"><title>Arsitektur Inventory API</title>
 <style>
   html,body{margin:0;background:#fff}
   svg{display:block;font-family:"Segoe UI",Arial,sans-serif}
-  .t{font-size:15px;fill:#1f2937}
+  .t{font-size:15px;fill:#111827}
   .s{font-size:13px;fill:#4b5563}
-  .m{font-family:Consolas,monospace;font-size:13px;fill:#1f2937}
-  .h{font-size:17px;font-weight:700}
-  .lbl{font-size:13px;font-weight:600}
-  .hl{paint-order:stroke;stroke:#fff;stroke-width:6px;stroke-linejoin:round}
+  .m{font-family:Consolas,monospace;font-size:13px;fill:#111827}
+  .h{font-size:16px;font-weight:700;fill:#111827}
+  .b{font-size:13px;font-weight:600}
+  .halo{paint-order:stroke;stroke:#fff;stroke-width:6px;stroke-linejoin:round}
+  .num{font-size:13px;font-weight:700;fill:#fff}
 </style></head>
 <body>
-<svg width="1800" height="1120" viewBox="0 0 1800 1120" xmlns="http://www.w3.org/2000/svg">
+<svg width="1500" height="1060" viewBox="0 0 1500 1060" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <marker id="aReq" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1e3a8a"/></marker>
-    <marker id="aRes" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0f766e"/></marker>
-    <marker id="aDep" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c2410c"/></marker>
-    <marker id="aIam" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b91c1c"/></marker>
+    <marker id="aR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0f766e"/></marker>
+    <marker id="aD" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b45309"/></marker>
+    <marker id="aI" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b91c1c"/></marker>
+    <marker id="aG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#374151"/></marker>
   </defs>
 
-  <!-- Title -->
-  <text x="50" y="52" style="font-size:30px;font-weight:800;fill:#111827">Inventory API — Container Architecture (Track B)</text>
-  <text x="50" y="82" class="s" style="font-size:16px">Amazon EC2 + Docker + Amazon ECR · Region us-east-1 · AWS Academy Lab (Microservices &amp; CI/CD)</text>
+  <text x="40" y="48" style="font-size:26px;font-weight:700;fill:#111827">Arsitektur Inventory API di AWS</text>
+  <text x="40" y="76" class="s" style="font-size:15px">Track B: Amazon EC2 + Docker + Amazon ECR, region us-east-1, AWS Academy Lab</text>
 
-  <!-- Left actors -->
-  <rect x="50" y="300" width="230" height="120" rx="14" fill="#eef2ff" stroke="#1e3a8a" stroke-width="2"/>
-  <text x="165" y="340" text-anchor="middle" class="h" fill="#1e3a8a">Client</text>
-  <text x="165" y="365" text-anchor="middle" class="s">curl / Postman / browser</text>
-  <text x="165" y="386" text-anchor="middle" class="s">(week 12: curl dari dalam EC2)</text>
+  <!-- Outside actors -->
+  <rect x="40" y="320" width="240" height="96" rx="8" fill="#fff" stroke="#6b7280" stroke-width="1.5"/>
+  <text x="160" y="356" text-anchor="middle" class="h">Repositori GitHub</text>
+  <text x="160" y="380" text-anchor="middle" class="m" style="font-size:12px">Yeypayeyy/Cloudcomputing</text>
+  <text x="160" y="400" text-anchor="middle" class="s">kode, Dockerfile, skrip uji</text>
 
-  <rect x="50" y="520" width="230" height="110" rx="14" fill="#f3f4f6" stroke="#374151" stroke-width="2"/>
-  <text x="165" y="560" text-anchor="middle" class="h" fill="#111827">Admin / Developer</text>
-  <text x="165" y="585" text-anchor="middle" class="s">EC2 Instance Connect</text>
-  <text x="165" y="605" text-anchor="middle" class="s">(SSH port 22, via console)</text>
+  <rect x="40" y="490" width="240" height="96" rx="8" fill="#fff" stroke="#6b7280" stroke-width="1.5"/>
+  <text x="160" y="528" text-anchor="middle" class="h">Klien</text>
+  <text x="160" y="552" text-anchor="middle" class="s">curl / Postman</text>
+  <text x="160" y="572" text-anchor="middle" class="s">(minggu ini: curl dari dalam EC2)</text>
 
-  <rect x="50" y="730" width="230" height="110" rx="14" fill="#f3f4f6" stroke="#374151" stroke-width="2"/>
-  <text x="165" y="770" text-anchor="middle" class="h" fill="#111827">GitHub repo (public)</text>
-  <text x="165" y="795" text-anchor="middle" class="m">Yeypayeyy/Cloudcomputing</text>
-  <text x="165" y="815" text-anchor="middle" class="s">app code + Dockerfile</text>
+  <rect x="40" y="636" width="240" height="84" rx="8" fill="#fff" stroke="#6b7280" stroke-width="1.5"/>
+  <text x="160" y="670" text-anchor="middle" class="h">Admin</text>
+  <text x="160" y="694" text-anchor="middle" class="s">EC2 Instance Connect</text>
 
-  <!-- AWS Cloud -->
-  <rect x="350" y="120" width="1410" height="840" rx="18" fill="none" stroke="#111827" stroke-width="2.5"/>
-  <rect x="350" y="120" width="230" height="40" rx="10" fill="#111827"/>
-  <text x="465" y="146" text-anchor="middle" style="font-size:16px;font-weight:700;fill:#fff">AWS Cloud · us-east-1</text>
+  <!-- AWS boundary -->
+  <rect x="330" y="110" width="1130" height="690" rx="10" fill="#fafafa" stroke="#111827" stroke-width="2"/>
+  <text x="350" y="138" class="b" style="font-size:15px;fill:#111827">AWS Cloud, region us-east-1</text>
 
-  <!-- VPC -->
-  <rect x="385" y="185" width="960" height="745" rx="16" fill="#faf5ff" stroke="#7c3aed" stroke-width="2"/>
-  <text x="405" y="214" class="lbl" fill="#7c3aed" style="font-size:15px">LabVPC (vpc-0e087582dd5a05aa6) · Internet Gateway</text>
+  <rect x="365" y="160" width="745" height="620" rx="8" fill="#fff" stroke="#6b7280" stroke-width="1.5"/>
+  <text x="383" y="186" class="b" style="fill:#374151">LabVPC (vpc-0e087582dd5a05aa6)</text>
 
-  <!-- Subnet -->
-  <rect x="415" y="232" width="900" height="672" rx="14" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
-  <text x="435" y="260" class="lbl" fill="#15803d" style="font-size:15px">Public subnet · us-east-1a</text>
+  <rect x="395" y="200" width="685" height="560" rx="8" fill="#fff" stroke="#9ca3af" stroke-width="1.5"/>
+  <text x="413" y="224" class="b" style="fill:#4b5563">Public subnet us-east-1a</text>
 
-  <!-- Security group -->
-  <rect x="445" y="278" width="840" height="600" rx="12" fill="none" stroke="#dc2626" stroke-width="2" stroke-dasharray="9 6"/>
-  <text x="465" y="304" class="lbl" fill="#b91c1c" style="font-size:14px">Security group Ec2AppNodeSecurityGroup · inbound TCP 22 (SSH), 80 (HTTP) · port app 8080 tidak dibuka ke publik</text>
+  <rect x="425" y="240" width="625" height="500" rx="8" fill="none" stroke="#b91c1c" stroke-width="1.5" stroke-dasharray="7 5"/>
+  <text x="443" y="264" class="b" style="fill:#b91c1c">Security group: inbound hanya TCP 22 dan 80</text>
 
   <!-- EC2 -->
-  <rect x="475" y="322" width="780" height="530" rx="12" fill="#fff7ed" stroke="#ea580c" stroke-width="2.5"/>
-  <text x="865" y="354" text-anchor="middle" class="h" fill="#c2410c" style="font-size:19px">Amazon EC2 · MonolithicAppServer</text>
-  <text x="865" y="378" text-anchor="middle" class="s">t2.micro · Ubuntu 20.04 · Docker 26 · IAM role: none</text>
+  <rect x="455" y="280" width="565" height="440" rx="8" fill="#f3f4f6" stroke="#111827" stroke-width="2"/>
+  <text x="475" y="308" class="h">EC2 MonolithicAppServer</text>
+  <text x="475" y="328" class="s">t2.micro, Ubuntu 20.04, Docker 26, tanpa IAM role</text>
 
-  <!-- Docker host label -->
-  <rect x="500" y="395" width="730" height="300" rx="10" fill="#ffffff" stroke="#fdba74" stroke-width="1.5"/>
-  <text x="515" y="417" class="s" style="font-weight:600;fill:#9a3412">Docker Engine · port mapping host → container</text>
+  <rect x="485" y="348" width="270" height="76" rx="6" fill="#fff" stroke="#b45309" stroke-width="1.5"/>
+  <text x="620" y="378" text-anchor="middle" class="b" style="fill:#92400e">docker build</text>
+  <text x="620" y="400" text-anchor="middle" class="m">inventory-service:v1</text>
 
-  <!-- inventory-service container -->
-  <rect x="520" y="432" width="340" height="245" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="2.5"/>
-  <text x="690" y="462" text-anchor="middle" class="h" fill="#1d4ed8">Container: inventory-service</text>
-  <text x="690" y="484" text-anchor="middle" class="s">Python 3.12 · Flask · gunicorn · user non-root</text>
-  <text x="690" y="504" text-anchor="middle" class="s">host :8080 → container :5000</text>
-  <text x="545" y="535" class="m">POST   /items</text>
-  <text x="545" y="557" class="m">GET    /items</text>
-  <text x="545" y="579" class="m">GET    /items/{itemId}</text>
-  <text x="545" y="601" class="m">PUT    /items/{itemId}</text>
-  <text x="545" y="623" class="m">DELETE /items/{itemId}</text>
-  <text x="545" y="645" class="m">GET    /health</text>
-  <text x="690" y="667" text-anchor="middle" class="s" style="font-weight:600;fill:#1e40af">entitas: Item</text>
+  <rect x="485" y="460" width="290" height="235" rx="6" fill="#fff" stroke="#0f766e" stroke-width="2"/>
+  <text x="630" y="490" text-anchor="middle" class="h">Container inventory-service</text>
+  <text x="630" y="511" text-anchor="middle" class="s">Flask + gunicorn, user non-root</text>
+  <text x="630" y="531" text-anchor="middle" class="s">port host 8080 ke container 5000</text>
+  <text x="510" y="563" class="m">POST   /items</text>
+  <text x="510" y="583" class="m">GET    /items</text>
+  <text x="510" y="603" class="m">GET    /items/{itemId}</text>
+  <text x="510" y="623" class="m">PUT    /items/{itemId}</text>
+  <text x="510" y="643" class="m">DELETE /items/{itemId}</text>
+  <text x="510" y="663" class="m">GET    /health</text>
 
-  <!-- stock-service planned -->
-  <rect x="890" y="432" width="320" height="245" rx="10" fill="#f9fafb" stroke="#6b7280" stroke-width="2" stroke-dasharray="7 5"/>
-  <text x="1050" y="462" text-anchor="middle" class="h" fill="#4b5563">Container: stock-service</text>
-  <text x="1050" y="484" text-anchor="middle" class="s">(direncanakan, minggu berikutnya)</text>
-  <text x="1050" y="504" text-anchor="middle" class="s">host :8081 → container :5000</text>
-  <text x="915" y="540" class="m">POST /stock/in</text>
-  <text x="915" y="562" class="m">POST /stock/out</text>
-  <text x="915" y="584" class="m">GET  /stock/history</text>
-  <text x="1050" y="620" text-anchor="middle" class="s">memanggil inventory-service</text>
-  <text x="1050" y="640" text-anchor="middle" class="s">untuk update quantity</text>
-
-  <!-- arrow stock -> inventory -->
-  <line x1="888" y1="560" x2="864" y2="560" stroke="#6b7280" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#aReq)"/>
-
-  <!-- Volume -->
-  <rect x="520" y="740" width="340" height="90" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="2"/>
-  <text x="690" y="772" text-anchor="middle" class="h" fill="#854d0e">Docker volume: inventory-data</text>
-  <text x="690" y="796" text-anchor="middle" class="s">SQLite /data/inventory.db (EBS-backed)</text>
-  <text x="690" y="816" text-anchor="middle" class="s">data tetap ada saat container restart</text>
-  <line x1="690" y1="678" x2="690" y2="736" stroke="#1e3a8a" stroke-width="2.5" marker-end="url(#aReq)" marker-start="url(#aReq)"/>
-  <text x="700" y="712" class="s hl">read / write</text>
+  <rect x="830" y="525" width="170" height="104" rx="6" fill="#fff" stroke="#374151" stroke-width="1.5"/>
+  <text x="915" y="555" text-anchor="middle" class="b" style="fill:#111827">Docker volume</text>
+  <text x="915" y="576" text-anchor="middle" class="m" style="font-size:12px">inventory-data</text>
+  <text x="915" y="598" text-anchor="middle" class="s">SQLite</text>
+  <text x="915" y="616" text-anchor="middle" class="s">inventory.db</text>
 
   <!-- ECR -->
-  <rect x="1400" y="250" width="320" height="200" rx="14" fill="#fff7ed" stroke="#ea580c" stroke-width="2.5"/>
-  <text x="1560" y="286" text-anchor="middle" class="h" fill="#c2410c" style="font-size:19px">Amazon ECR</text>
-  <text x="1560" y="309" text-anchor="middle" class="s">private repository</text>
-  <text x="1560" y="342" text-anchor="middle" class="m" style="font-size:15px">inventory-service:v1</text>
-  <text x="1560" y="366" text-anchor="middle" class="s">stock-service (direncanakan)</text>
-  <text x="1560" y="396" text-anchor="middle" class="s">enkripsi at rest AES-256</text>
-  <text x="1560" y="418" text-anchor="middle" class="s">tag mutable · 49.83 MB</text>
+  <rect x="1160" y="320" width="270" height="130" rx="8" fill="#fff" stroke="#b45309" stroke-width="2"/>
+  <text x="1295" y="352" text-anchor="middle" class="h">Amazon ECR (privat)</text>
+  <text x="1295" y="378" text-anchor="middle" class="m">inventory-service:v1</text>
+  <text x="1295" y="402" text-anchor="middle" class="s">enkripsi AES-256</text>
+  <text x="1295" y="424" text-anchor="middle" class="s">tag image = versi rilis</text>
+
+  <!-- Credentials -->
+  <rect x="1160" y="560" width="270" height="150" rx="8" fill="#fff" stroke="#b91c1c" stroke-width="2"/>
+  <text x="1295" y="592" text-anchor="middle" class="h">Kredensial sesi lab</text>
+  <text x="1295" y="616" text-anchor="middle" class="s">sementara (voclabs)</text>
+  <text x="1295" y="642" text-anchor="middle" class="s">hanya untuk login ECR,</text>
+  <text x="1295" y="662" text-anchor="middle" class="s">push, dan pull, lalu dihapus</text>
+  <text x="1295" y="688" text-anchor="middle" class="s">tidak ada key di repo</text>
+
+  <!-- Deploy arrows -->
+  <path d="M280,368 L483,382" fill="none" stroke="#b45309" stroke-width="2.5" stroke-dasharray="8 5" marker-end="url(#aD)"/>
+  <circle cx="318" cy="350" r="11" fill="#b45309"/><text x="318" y="355" text-anchor="middle" class="num">1</text>
+  <text x="336" y="355" class="b halo" style="fill:#92400e">git clone</text>
+
+  <path d="M755,372 L1158,372" fill="none" stroke="#b45309" stroke-width="2.5" stroke-dasharray="8 5" marker-end="url(#aD)"/>
+  <circle cx="1078" cy="356" r="11" fill="#b45309"/><text x="1078" y="361" text-anchor="middle" class="num">2</text>
+  <text x="1095" y="361" class="b halo" style="fill:#92400e">push</text>
+
+  <path d="M1158,430 L777,490" fill="none" stroke="#b45309" stroke-width="2.5" stroke-dasharray="8 5" marker-end="url(#aD)"/>
+  <circle cx="1078" cy="458" r="11" fill="#b45309"/><text x="1078" y="463" text-anchor="middle" class="num">3</text>
+  <text x="1095" y="476" class="b halo" style="fill:#92400e">pull &amp; run</text>
+
+  <!-- Request arrows -->
+  <path d="M280,520 L483,520" fill="none" stroke="#0f766e" stroke-width="2.5" marker-end="url(#aR)"/>
+  <circle cx="318" cy="504" r="11" fill="#0f766e"/><text x="318" y="509" text-anchor="middle" class="num">4</text>
+  <text x="336" y="509" class="b halo" style="fill:#0f766e">HTTP :8080</text>
+
+  <path d="M777,577 L828,577" fill="none" stroke="#0f766e" stroke-width="2.5" marker-end="url(#aR)" marker-start="url(#aR)"/>
+  <circle cx="803" cy="556" r="11" fill="#0f766e"/><text x="803" y="561" text-anchor="middle" class="num">5</text>
+
+  <path d="M483,570 L282,570" fill="none" stroke="#0f766e" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#aR)"/>
+  <circle cx="318" cy="590" r="11" fill="#0f766e"/><text x="318" y="595" text-anchor="middle" class="num">6</text>
+  <text x="336" y="595" class="b halo" style="fill:#0f766e">respons JSON</text>
+
+  <!-- Admin -->
+  <path d="M280,678 L453,678" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#aG)"/>
+  <text x="298" y="668" class="b halo" style="fill:#374151">SSH :22</text>
 
   <!-- IAM -->
-  <rect x="1400" y="560" width="320" height="210" rx="14" fill="#fef2f2" stroke="#dc2626" stroke-width="2.5"/>
-  <text x="1560" y="596" text-anchor="middle" class="h" fill="#b91c1c" style="font-size:19px">IAM: kredensial lab</text>
-  <text x="1560" y="620" text-anchor="middle" class="s">voclabs session (sementara)</text>
-  <text x="1560" y="648" text-anchor="middle" class="s">dipakai hanya untuk</text>
-  <text x="1560" y="668" text-anchor="middle" class="s">ecr get-login-password + push/pull</text>
-  <text x="1560" y="696" text-anchor="middle" class="s">dihapus dari server setelah dipakai</text>
-  <text x="1560" y="716" text-anchor="middle" class="s">(rm ~/.aws/credentials, docker logout)</text>
-  <text x="1560" y="744" text-anchor="middle" class="s">tidak ada access key di repo</text>
+  <path d="M1295,558 L1295,452" fill="none" stroke="#b91c1c" stroke-width="2" stroke-dasharray="4 4" marker-end="url(#aI)"/>
+  <text x="1305" y="510" class="b halo" style="fill:#b91c1c">autentikasi</text>
 
-  <!-- Request flow: client -> EC2 container -->
-  <path d="M280,345 L500,345 L520,470" fill="none" stroke="#1e3a8a" stroke-width="3" marker-end="url(#aReq)"/>
-  <text x="300" y="335" class="lbl hl" fill="#1e3a8a">① HTTP request :8080</text>
-  <path d="M520,520 L470,520 L470,395 L284,395" fill="none" stroke="#0f766e" stroke-width="2.5" stroke-dasharray="8 5" marker-end="url(#aRes)"/>
-  <text x="300" y="413" class="lbl hl" fill="#0f766e">④ JSON 200/201/400/404/409</text>
-  <text x="300" y="445" class="s hl" style="fill:#1e3a8a">② validasi input → ③ SQLite</text>
+  <!-- Bottom panels -->
+  <rect x="40" y="830" width="880" height="190" rx="8" fill="#fff" stroke="#d1d5db"/>
+  <text x="60" y="860" class="h">Urutan langkah</text>
+  <text x="60" y="888" class="t"><tspan style="fill:#b45309;font-weight:700">Deploy</tspan>  1 kode di-clone ke EC2 dan di-build jadi image,  2 image di-push ke ECR,</text>
+  <text x="60" y="912" class="t">3 container dijalankan dari image ECR dengan volume <tspan class="m">inventory-data</tspan>.</text>
+  <text x="60" y="944" class="t"><tspan style="fill:#0f766e;font-weight:700">Request</tspan>  4 klien memanggil port 8080,  5 aplikasi memvalidasi input lalu membaca/menulis</text>
+  <text x="60" y="968" class="t">SQLite,  6 aplikasi membalas JSON (200, 201, 400, 404, atau 409).</text>
+  <text x="60" y="1000" class="s">Garis putus-putus oranye: deploy. Garis hijau: request. Garis merah: autentikasi. Kotak merah putus-putus: security group.</text>
 
-  <!-- Admin -> EC2 -->
-  <path d="M280,575 L475,575" fill="none" stroke="#374151" stroke-width="2.5" marker-end="url(#aReq)"/>
-  <text x="298" y="565" class="lbl hl" fill="#374151">SSH :22</text>
-
-  <!-- GitHub -> EC2 : git clone -->
-  <path d="M280,785 L475,785" fill="none" stroke="#c2410c" stroke-width="2.5" stroke-dasharray="8 5" marker-end="url(#aDep)"/>
-  <text x="298" y="775" class="lbl hl" fill="#c2410c">a. git clone</text>
-  <text x="298" y="805" class="s hl" style="fill:#c2410c">b. docker build</text>
-
-  <!-- EC2 -> ECR push -->
-  <path d="M1255,345 L1398,320" fill="none" stroke="#c2410c" stroke-width="2.5" stroke-dasharray="8 5" marker-end="url(#aDep)"/>
-  <text x="1268" y="318" class="lbl hl" fill="#c2410c">c. docker push</text>
-  <!-- ECR -> EC2 pull -->
-  <path d="M1398,400 L1257,420" fill="none" stroke="#c2410c" stroke-width="2.5" stroke-dasharray="8 5" marker-end="url(#aDep)"/>
-  <text x="1268" y="438" class="lbl hl" fill="#c2410c">d. docker pull &amp; run</text>
-
-  <!-- IAM -> EC2 auth -->
-  <path d="M1398,665 L1257,665" fill="none" stroke="#b91c1c" stroke-width="2.5" stroke-dasharray="4 4" marker-end="url(#aIam)"/>
-  <text x="1268" y="655" class="lbl hl" fill="#b91c1c">auth ECR</text>
-  <path d="M1560,558 L1560,452" fill="none" stroke="#b91c1c" stroke-width="2" stroke-dasharray="4 4" marker-end="url(#aIam)"/>
-  <text x="1570" y="510" class="s hl" style="fill:#b91c1c">akses repo</text>
-
-  <!-- Legend -->
-  <rect x="50" y="985" width="1710" height="115" rx="12" fill="#f9fafb" stroke="#d1d5db"/>
-  <text x="75" y="1015" class="lbl" style="font-size:15px;fill:#111827">Legenda &amp; catatan keamanan</text>
-  <line x1="75" y1="1045" x2="135" y2="1045" stroke="#1e3a8a" stroke-width="3" marker-end="url(#aReq)"/><text x="145" y="1050" class="t">request</text>
-  <line x1="245" y1="1045" x2="305" y2="1045" stroke="#0f766e" stroke-width="2.5" stroke-dasharray="8 5" marker-end="url(#aRes)"/><text x="315" y="1050" class="t">response</text>
-  <line x1="425" y1="1045" x2="485" y2="1045" stroke="#c2410c" stroke-width="2.5" stroke-dasharray="8 5" marker-end="url(#aDep)"/><text x="495" y="1050" class="t">build / deploy</text>
-  <line x1="635" y1="1045" x2="695" y2="1045" stroke="#b91c1c" stroke-width="2.5" stroke-dasharray="4 4" marker-end="url(#aIam)"/><text x="705" y="1050" class="t">IAM / auth</text>
-  <rect x="820" y="1032" width="44" height="26" rx="5" fill="none" stroke="#6b7280" stroke-width="2" stroke-dasharray="6 4"/><text x="875" y="1050" class="t">komponen yang direncanakan</text>
-  <text x="75" y="1083" class="s" style="font-size:14px">• Lab memblokir pembuatan instance &amp; IAM role baru → instance lab dipakai ulang  • Kredensial sementara dihapus setelah push  • ECR privat  • Container jalan sebagai non-root  • Port 8080 hanya diakses dari dalam instance</text>
+  <rect x="940" y="830" width="520" height="190" rx="8" fill="#fff" stroke="#9ca3af" stroke-dasharray="6 4"/>
+  <text x="960" y="860" class="h">Tahap berikutnya (belum dibangun)</text>
+  <text x="960" y="890" class="t">stock-service di port 8081: mencatat barang</text>
+  <text x="960" y="912" class="t">masuk/keluar, memanggil inventory-service</text>
+  <text x="960" y="934" class="t">untuk mengubah quantity.</text>
+  <text x="960" y="966" class="t">Lalu pindah ke ECS Fargate + ALB, SQLite</text>
+  <text x="960" y="988" class="t">diganti RDS, build otomatis via CodePipeline.</text>
 </svg>
 </body></html>
