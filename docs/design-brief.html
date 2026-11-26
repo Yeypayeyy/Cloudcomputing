@@ -1,75 +1,136 @@
 <!DOCTYPE html>
 <html lang="id"><head><meta charset="utf-8"><title>Design Brief — Inventory API</title>
 <style>
-  @page { size: A4; margin: 15mm 17mm 13mm 17mm; }
-  body { font-family: "Times New Roman", Times, serif; font-size: 11pt; line-height: 1.3; color: #000; }
-  h1 { text-align: center; font-size: 17pt; margin: 0 0 4pt; }
-  .sub { text-align: center; font-weight: bold; margin: 0 0 8pt; }
-  .meta p { margin: 1pt 0; }
-  h2 { font-size: 13pt; margin: 11pt 0 4pt; }
-  p { margin: 3pt 0; text-align: justify; }
-  table { border-collapse: collapse; width: 100%; margin: 4pt 0 6pt; font-size: 10.5pt; }
-  th, td { border: 1px solid #000; padding: 1.5pt 5pt; vertical-align: top; text-align: left; }
-  h2 { margin: 8pt 0 3pt !important; }
-  th { background: #f0f0f0; }
-  code { font-family: Consolas, monospace; font-size: 9.5pt; }
-  .fig { text-align: center; margin: 6pt 0 2pt; }
-  .fig img { width: 94%; }
-  .cap { text-align: center; font-style: italic; margin: 0 0 6pt; }
-  a { color: #1a0dab; }
+  @page { size: A4; margin: 13mm 15mm 12mm 15mm; }
+  * { box-sizing: border-box; }
+  body { font-family: "Segoe UI", Calibri, Arial, sans-serif; font-size: 9.6pt; line-height: 1.36; color: #1f2933; margin: 0; }
+  .head { border-left: 6px solid #0e7490; padding: 2pt 0 2pt 10pt; margin-bottom: 7pt; }
+  .head .k { font-size: 8.5pt; letter-spacing: .08em; text-transform: uppercase; color: #0e7490; font-weight: 700; }
+  .head h1 { margin: 1pt 0 0; font-size: 18pt; color: #0f172a; }
+  .head .tag { font-size: 10pt; color: #475569; }
+  .id { display: grid; grid-template-columns: 1fr 1fr; gap: 0 18pt; background: #f1f5f9; border-radius: 6px; padding: 5pt 9pt; margin-bottom: 6pt; }
+  .id div { padding: 1pt 0; }
+  .id b { display: inline-block; width: 62pt; color: #334155; }
+  h2 { font-size: 11.2pt; color: #0e7490; margin: 8pt 0 3pt; padding-bottom: 1.5pt; border-bottom: 1px solid #cbd5e1; }
+  h2 span { color: #94a3b8; font-weight: 600; margin-right: 4pt; }
+  p { margin: 2pt 0 3pt; text-align: justify; }
+  ul, ol { margin: 2pt 0 3pt; padding-left: 15pt; }
+  li { margin: 1pt 0; }
+  table { border-collapse: collapse; width: 100%; margin: 3pt 0 4pt; font-size: 9pt; }
+  th { background: #0e7490; color: #fff; text-align: left; padding: 2.5pt 5pt; font-weight: 600; }
+  td { border-bottom: 1px solid #e2e8f0; padding: 1.2pt 5pt; vertical-align: top; }
+  tr:nth-child(even) td { background: #f8fafc; }
+  code { font-family: Consolas, monospace; font-size: 8.6pt; background: #f1f5f9; padding: 0 2px; border-radius: 2px; }
+  pre { font-family: Consolas, monospace; font-size: 8.2pt; background: #0f172a; color: #e2e8f0; padding: 5pt 7pt; border-radius: 5px; margin: 3pt 0; line-height: 1.3; white-space: pre-wrap; }
+  .cols { break-inside: avoid; display: grid; grid-template-columns: 1.15fr 1fr; gap: 10pt; }
+  .fig { margin: 4pt 0 0; text-align: center; }
+  .fig img { width: 100%; border: 1px solid #e2e8f0; border-radius: 4px; }
+  .cap { text-align: center; font-size: 8.5pt; color: #64748b; margin: 1pt 0 2pt; }
+  .ok { color: #15803d; font-weight: 700; }
+  .page2 { break-before: page; }
+  a { color: #0e7490; }
 </style></head>
 <body>
-<h1>Tugas Cloud Computing</h1>
-<p class="sub">Tugas Individu Week 12</p>
-<div class="meta">
-  <p><b>Topik:</b> Desain Arsitektur dan Setup Awal AWS untuk Inventory API</p>
-  <p><b>Nama:</b> Muhammad Farrel Al Ghazy (24/540589/TK/60022)</p>
-  <p><b>Repositori:</b> <a href="https://github.com/Yeypayeyy/Cloudcomputing">github.com/Yeypayeyy/Cloudcomputing</a></p>
+
+<div class="head">
+  <div class="k">Cloud Computing · Proyek Individu · Week 12 — Design &amp; AWS Setup</div>
+  <h1>Design Brief: Inventory API</h1>
+  <div class="tag">REST API pencatatan stok barang di atas container Docker (Track B)</div>
 </div>
 
-<h2>1. Use Case</h2>
-<p>Stok barang di gudang atau laboratorium (laptop, mouse, kabel, alat tulis, dan sebagainya) sering dicatat manual di spreadsheet yang diedit banyak orang, sehingga jumlah stok tidak sinkron dan lokasi barang sulit dilacak. Proyek ini membangun REST API sederhana untuk mengelola data barang: petugas dapat menambah barang baru, melihat daftar dan detail barang, memperbarui jumlah stok atau lokasi rak, serta menghapus data yang salah input. Setiap barang punya SKU unik supaya tidak tercatat ganda.</p>
+<div class="id">
+  <div><b>Nama</b> Muhammad Farrel Al Ghazy</div>
+  <div><b>Track</b> B — Containers (EC2 + Docker + ECR)</div>
+  <div><b>NIM</b> 24/540589/TK/60022</div>
+  <div><b>Repositori</b> <a href="https://github.com/Yeypayeyy/Cloudcomputing">github.com/Yeypayeyy/Cloudcomputing</a></div>
+</div>
 
-<h2>2. Track yang Dipilih: Track B (Containers)</h2>
+<h2><span>01</span>Latar Belakang dan Tujuan</h2>
+<p>Banyak gudang kecil dan laboratorium masih mencatat stok di spreadsheet yang diedit bergantian. Akibatnya angka stok sering selisih, barang yang sama tercatat dua kali dengan nama berbeda, dan lokasi rak tidak jelas. Proyek ini menyediakan satu sumber data stok lewat HTTP, sehingga aplikasi lain cukup memanggil API. Target minggu ini:</p>
+<ul>
+  <li>satu entitas (<b>Item</b>) dengan operasi CRUD lengkap dan validasi input, termasuk SKU unik;</li>
+  <li>service dikemas sebagai image Docker yang sama untuk lokal dan cloud, disimpan berversi di ECR;</li>
+  <li>infrastruktur awal di AWS siap dan konektivitasnya terbukti lewat uji end-to-end.</li>
+</ul>
+
+<h2><span>02</span>Rancangan Solusi</h2>
+<p>Track B dipilih karena container menghilangkan masalah "jalan di laptop tapi tidak di server": image yang dites lokal adalah image yang sama yang ditarik EC2 dari ECR. Pemisahan per service juga menyiapkan jalan ke ECS pada minggu berikutnya. Konsekuensinya, server masih dikelola sendiri tanpa autoscaling/HA.</p>
 <table>
-  <tr><th style="width:17%">Komponen</th><th style="width:38%">Layanan AWS / Tools</th><th>Fungsi</th></tr>
-  <tr><td>Compute</td><td>Amazon EC2 <i>MonolithicAppServer</i> (t2.micro, Ubuntu 20.04) + Docker 26</td><td>Host yang menjalankan container service</td></tr>
-  <tr><td>Registry</td><td>Amazon ECR (private), enkripsi AES-256</td><td>Menyimpan image berversi <code>inventory-service:v1</code></td></tr>
-  <tr><td>Jaringan</td><td>LabVPC, public subnet us-east-1a, security group lab</td><td>Inbound SSH (22) dan HTTP (80); service berjalan di port host 8080</td></tr>
-  <tr><td>Keamanan</td><td>Kredensial sesi AWS Academy (sementara)</td><td>Hanya untuk login, push, dan pull ECR, lalu dihapus dari server</td></tr>
-  <tr><td>Penyimpanan</td><td>SQLite di Docker volume <code>inventory-data</code></td><td>Data tetap ada walaupun container di-restart atau diganti</td></tr>
+  <tr><th style="width:21%">Service</th><th style="width:16%">Status</th><th style="width:15%">Port host</th><th>Tanggung jawab</th></tr>
+  <tr><td><code>inventory-service</code></td><td><span class="ok">dibangun</span></td><td>8080 → 5000</td><td>CRUD data barang, validasi, penyimpanan SQLite</td></tr>
+  <tr><td><code>stock-service</code></td><td>direncanakan</td><td>8081 → 5000</td><td>Mencatat barang masuk/keluar lalu memanggil inventory-service untuk mengubah <code>quantity</code></td></tr>
 </table>
-<p>Ada dua service yang direncanakan. <b>inventory-service</b> sudah dibangun minggu ini untuk CRUD data barang. <b>stock-service</b> akan menyusul untuk mencatat barang masuk dan keluar, lalu memanggil inventory-service untuk memperbarui <code>quantity</code>. Saya memilih Track B karena image Docker berjalan sama persis di laptop maupun di EC2, image di ECR bisa langsung dipakai ECS pada tahap berikutnya, dan lab AWS Academy yang dipakai menyediakan EC2 serta ECR. Kekurangannya, server masih dikelola sendiri dan belum ada high availability (hanya satu instance).</p>
 
-<h2>3. Arsitektur dan Alur Data</h2>
-<p><b>Alur deploy.</b> (a) Kode di-<i>clone</i> dari GitHub ke EC2, (b) di-<i>build</i> menjadi image Docker, (c) di-<i>push</i> ke ECR, lalu (d) container dijalankan dari image ECR tersebut dengan port 8080 di host dipetakan ke port 5000 di container.</p>
-<p><b>Alur request.</b> Klien mengirim HTTP request ke port 8080. Docker meneruskannya ke container inventory-service (Flask + gunicorn, user non-root). Aplikasi memvalidasi input, membaca atau menulis SQLite di volume, lalu membalas JSON dengan kode 200, 201, 400, 404, atau 409.</p>
-<p><b>IAM dan jaringan.</b> Instance lab tidak memiliki IAM role, dan lab tidak mengizinkan pembuatan instance atau role baru. Karena itu instance bawaan lab dipakai ulang, dan untuk akses ECR digunakan kredensial sesi sementara yang dihapus (<code>rm ~/.aws/credentials</code>, <code>docker logout</code>) segera setelah image di-pull. Tidak ada access key di kode maupun repositori. Security group hanya membuka port 22 dan 80, jadi API diuji dari dalam instance melalui EC2 Instance Connect.</p>
-
+<h2><span>03</span>Arsitektur, Alur Data, dan Keamanan</h2>
 <div class="fig"><img src="architecture-diagram.png" alt="Diagram arsitektur"></div>
-<p class="cap">Gambar 1. Arsitektur Inventory API pada Track B.</p>
+<div class="cap">Gambar 1. Komponen, alur request, alur deploy, dan batas keamanan Inventory API.</div>
+<div class="cols">
+  <div>
+    <p><b>Alur request (①–④):</b> klien mengirim HTTP ke port 8080 → Docker meneruskan ke container :5000 → Flask memvalidasi body dan menjalankan query SQLite di volume → API membalas JSON beserta status code yang sesuai.</p>
+    <p><b>Alur deploy (a–d):</b> <code>git clone</code> repo publik ke EC2 → <code>docker build</code> → <code>docker push</code> ke ECR → <code>docker pull</code> &amp; <code>run</code> dengan volume dan <code>--restart unless-stopped</code>.</p>
+  </div>
+  <div>
+    <p><b>Keamanan:</b></p>
+    <ul>
+      <li>Instance tidak punya IAM role, dan lab melarang membuat role baru. Akses ECR memakai kredensial sesi sementara yang dihapus setelah pull.</li>
+      <li>ECR privat dengan enkripsi AES-256. Tidak ada secret di repo.</li>
+      <li>Security group hanya membuka 22 dan 80, jadi port 8080 tidak terekspos publik.</li>
+      <li>Container berjalan sebagai user non-root.</li>
+    </ul>
+  </div>
+</div>
 
-<h2>4. Entitas Data: Item</h2>
+<h2><span>04</span>Model Data: Item</h2>
+<div class="cols">
+  <table>
+    <tr><th>Field</th><th>Tipe</th><th>Aturan</th></tr>
+    <tr><td><code>itemId</code></td><td>UUID</td><td>PK, dibuat server</td></tr>
+    <tr><td><code>name</code></td><td>string</td><td>wajib</td></tr>
+    <tr><td><code>sku</code></td><td>string</td><td>wajib, <b>unik</b></td></tr>
+    <tr><td><code>category</code></td><td>string</td><td>opsional</td></tr>
+    <tr><td><code>quantity</code></td><td>integer</td><td>wajib, ≥ 0</td></tr>
+    <tr><td><code>location</code></td><td>string</td><td>opsional (gudang/rak)</td></tr>
+    <tr><td><code>createdAt</code>, <code>updatedAt</code></td><td>ISO 8601</td><td>diisi server (UTC)</td></tr>
+  </table>
+<pre>POST /items
+{
+  "name": "Laptop Asus Vivobook 14",
+  "sku": "LPT-ASUS-014",
+  "category": "Elektronik",
+  "quantity": 10,
+  "location": "Gudang A - Rak 2"
+}
+→ 201 Created + itemId, createdAt, updatedAt</pre>
+</div>
+
+<h2><span>05</span>Kontrak API</h2>
 <table>
-  <tr><th style="width:26%">Atribut</th><th style="width:22%">Tipe</th><th>Keterangan</th></tr>
-  <tr><td>itemId</td><td>TEXT (UUID)</td><td>Primary key, dibuat otomatis</td></tr>
-  <tr><td>name</td><td>TEXT</td><td>Wajib, nama barang</td></tr>
-  <tr><td>sku</td><td>TEXT</td><td>Wajib dan unik (duplikat ditolak dengan 409)</td></tr>
-  <tr><td>category</td><td>TEXT</td><td>Opsional, misalnya Elektronik, ATK</td></tr>
-  <tr><td>quantity</td><td>INTEGER</td><td>Wajib, bilangan bulat ≥ 0</td></tr>
-  <tr><td>location</td><td>TEXT</td><td>Opsional, lokasi gudang/rak</td></tr>
-  <tr><td>createdAt, updatedAt</td><td>Timestamp ISO 8601</td><td>Diisi otomatis oleh API</td></tr>
+  <tr><th style="width:9%">CRUD</th><th style="width:25%">Endpoint</th><th style="width:24%">Body</th><th style="width:18%">Sukses</th><th>Error</th></tr>
+  <tr><td>Create</td><td><code>POST /items</code></td><td>name, sku, quantity (+opsional)</td><td>201 + item</td><td>400 field kurang/tipe salah · 409 SKU duplikat</td></tr>
+  <tr><td>Read</td><td><code>GET /items</code></td><td>—</td><td>200 {count, items}</td><td>—</td></tr>
+  <tr><td>Read</td><td><code>GET /items/{itemId}</code></td><td>—</td><td>200 + item</td><td>404 tidak ditemukan</td></tr>
+  <tr><td>Update</td><td><code>PUT /items/{itemId}</code></td><td>field yang diubah (parsial)</td><td>200 + item baru</td><td>400 · 404 · 409</td></tr>
+  <tr><td>Delete</td><td><code>DELETE /items/{itemId}</code></td><td>—</td><td>200 + pesan</td><td>404 tidak ditemukan</td></tr>
 </table>
+<p>Plus <code>GET /health</code> untuk cek konektivitas. Diuji otomatis via <code>test_app.py</code> dan di server via <code>scripts/crud-test.sh</code>.</p>
 
-<h2>5. Endpoint CRUD</h2>
+<h2><span>06</span>Status Setup AWS dan Bukti</h2>
 <table>
-  <tr><th style="width:13%">Operasi</th><th style="width:40%">Method dan Path</th><th>Respons</th></tr>
-  <tr><td>Create</td><td><code>POST /items</code></td><td>201 dan data baru; 400 jika data kurang/tidak valid; 409 jika SKU sudah ada</td></tr>
-  <tr><td>Read</td><td><code>GET /items</code> dan <code>GET /items/{itemId}</code></td><td>200 dan data; 404 jika tidak ditemukan</td></tr>
-  <tr><td>Update</td><td><code>PUT /items/{itemId}</code></td><td>200 dan data terbaru (mis. quantity, location); 400/404/409</td></tr>
-  <tr><td>Delete</td><td><code>DELETE /items/{itemId}</code></td><td>200 dan pesan konfirmasi; 404 jika tidak ditemukan</td></tr>
+  <tr><th style="width:4%">#</th><th style="width:40%">Langkah</th><th style="width:33%">Hasil</th><th>Screenshot</th></tr>
+  <tr><td>1</td><td>EC2 MonolithicAppServer berjalan di LabVPC</td><td class="ok">Running, 2/2 checks</td><td>01, 10</td></tr>
+  <tr><td>2</td><td>Clone repo dan install Docker di EC2</td><td class="ok">Berhasil, Docker 26.1.3</td><td>02</td></tr>
+  <tr><td>3</td><td>Build image <code>inventory-service:v1</code></td><td class="ok">Berhasil, 134 MB</td><td>03</td></tr>
+  <tr><td>4</td><td>Buat repo ECR privat dan push image</td><td class="ok">v1 tersimpan, digest sha256:ccf7…</td><td>04, 05, 09</td></tr>
+  <tr><td>5</td><td>Pull dan run container dari ECR</td><td class="ok">Up, /health = ok</td><td>06</td></tr>
+  <tr><td>6</td><td>Uji CRUD end-to-end (curl)</td><td class="ok">201 · 400 · 200 · 200 · 404</td><td>07, 08</td></tr>
+  <tr><td>7</td><td>Verifikasi security group inbound</td><td class="ok">Hanya TCP 22 dan 80</td><td>11</td></tr>
 </table>
+<p><b>Kendala:</b> run pertama gagal (<i>unable to open database file</i>) karena <code>VOLUME /data</code> dideklarasikan sebelum <code>chown</code>. Diatasi dengan mengubah owner volume di host, dan Dockerfile di repo sudah diperbaiki.</p>
 
-<h2>6. Bukti Setup AWS</h2>
-<p>Setup awal berhasil: repositori di-clone di EC2, image <code>inventory-service:v1</code> di-build dan di-push ke ECR privat, container dijalankan dari image ECR, dan keempat operasi CRUD sudah diuji dengan <code>scripts/crud-test.sh</code> (termasuk kasus 400 dan 404). Container sempat gagal start karena <code>VOLUME</code> di Dockerfile ditulis sebelum <code>chown</code>, sehingga <code>/data</code> milik root. Ini diatasi dengan mengubah kepemilikan volume di host, dan Dockerfile sudah dibetulkan untuk build berikutnya. Screenshot lengkap ada di folder <code>evidence/</code> di repositori.</p>
+<h2><span>07</span>Keterbatasan dan Rencana Berikutnya</h2>
+<ul>
+  <li><b>Satu instance, SQLite lokal.</b> Rencana: pindah ke Amazon RDS agar bisa diskalakan.</li>
+  <li><b>Deploy manual.</b> Rencana: build &amp; push otomatis per commit via CodePipeline/CodeBuild.</li>
+  <li><b>Belum terekspos publik, baru satu service.</b> Rencana: bangun <code>stock-service</code>, lalu ECS Fargate + ALB (<code>/items*</code>, <code>/stock*</code>).</li>
+</ul>
 </body></html>
