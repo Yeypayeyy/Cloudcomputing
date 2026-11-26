@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8"><title>Design Brief — Inventory API</title>
+<style>
+  @page { size: A4; margin: 15mm 17mm 13mm 17mm; }
+  body { font-family: "Times New Roman", Times, serif; font-size: 11pt; line-height: 1.3; color: #000; }
+  h1 { text-align: center; font-size: 17pt; margin: 0 0 4pt; }
+  .sub { text-align: center; font-weight: bold; margin: 0 0 8pt; }
+  .meta p { margin: 1pt 0; }
+  h2 { font-size: 13pt; margin: 11pt 0 4pt; }
+  p { margin: 3pt 0; text-align: justify; }
+  table { border-collapse: collapse; width: 100%; margin: 4pt 0 6pt; font-size: 10.5pt; }
+  th, td { border: 1px solid #000; padding: 1.5pt 5pt; vertical-align: top; text-align: left; }
+  h2 { margin: 8pt 0 3pt !important; }
+  th { background: #f0f0f0; }
+  code { font-family: Consolas, monospace; font-size: 9.5pt; }
+  .fig { text-align: center; margin: 6pt 0 2pt; }
+  .fig img { width: 94%; }
+  .cap { text-align: center; font-style: italic; margin: 0 0 6pt; }
+  a { color: #1a0dab; }
+</style></head>
+<body>
+<h1>Tugas Cloud Computing</h1>
+<p class="sub">Tugas Individu Week 12</p>
+<div class="meta">
+  <p><b>Topik:</b> Desain Arsitektur dan Setup Awal AWS untuk Inventory API</p>
+  <p><b>Nama:</b> Muhammad Farrel Al Ghazy (24/540589/TK/60022)</p>
+  <p><b>Repositori:</b> <a href="https://github.com/Yeypayeyy/Cloudcomputing">github.com/Yeypayeyy/Cloudcomputing</a></p>
+</div>
+
+<h2>1. Use Case</h2>
+<p>Stok barang di gudang atau laboratorium (laptop, mouse, kabel, alat tulis, dan sebagainya) sering dicatat manual di spreadsheet yang diedit banyak orang, sehingga jumlah stok tidak sinkron dan lokasi barang sulit dilacak. Proyek ini membangun REST API sederhana untuk mengelola data barang: petugas dapat menambah barang baru, melihat daftar dan detail barang, memperbarui jumlah stok atau lokasi rak, serta menghapus data yang salah input. Setiap barang punya SKU unik supaya tidak tercatat ganda.</p>
+
+<h2>2. Track yang Dipilih: Track B (Containers)</h2>
+<table>
+  <tr><th style="width:17%">Komponen</th><th style="width:38%">Layanan AWS / Tools</th><th>Fungsi</th></tr>
+  <tr><td>Compute</td><td>Amazon EC2 <i>MonolithicAppServer</i> (t2.micro, Ubuntu 20.04) + Docker 26</td><td>Host yang menjalankan container service</td></tr>
+  <tr><td>Registry</td><td>Amazon ECR (private), enkripsi AES-256</td><td>Menyimpan image berversi <code>inventory-service:v1</code></td></tr>
+  <tr><td>Jaringan</td><td>LabVPC, public subnet us-east-1a, security group lab</td><td>Inbound SSH (22) dan HTTP (80); service berjalan di port host 8080</td></tr>
+  <tr><td>Keamanan</td><td>Kredensial sesi AWS Academy (sementara)</td><td>Hanya untuk login, push, dan pull ECR, lalu dihapus dari server</td></tr>
+  <tr><td>Penyimpanan</td><td>SQLite di Docker volume <code>inventory-data</code></td><td>Data tetap ada walaupun container di-restart atau diganti</td></tr>
+</table>
+<p>Ada dua service yang direncanakan. <b>inventory-service</b> sudah dibangun minggu ini untuk CRUD data barang. <b>stock-service</b> akan menyusul untuk mencatat barang masuk dan keluar, lalu memanggil inventory-service untuk memperbarui <code>quantity</code>. Saya memilih Track B karena image Docker berjalan sama persis di laptop maupun di EC2, image di ECR bisa langsung dipakai ECS pada tahap berikutnya, dan lab AWS Academy yang dipakai menyediakan EC2 serta ECR. Kekurangannya, server masih dikelola sendiri dan belum ada high availability (hanya satu instance).</p>
+
+<h2>3. Arsitektur dan Alur Data</h2>
+<p><b>Alur deploy.</b> (a) Kode di-<i>clone</i> dari GitHub ke EC2, (b) di-<i>build</i> menjadi image Docker, (c) di-<i>push</i> ke ECR, lalu (d) container dijalankan dari image ECR tersebut dengan port 8080 di host dipetakan ke port 5000 di container.</p>
+<p><b>Alur request.</b> Klien mengirim HTTP request ke port 8080. Docker meneruskannya ke container inventory-service (Flask + gunicorn, user non-root). Aplikasi memvalidasi input, membaca atau menulis SQLite di volume, lalu membalas JSON dengan kode 200, 201, 400, 404, atau 409.</p>
+<p><b>IAM dan jaringan.</b> Instance lab tidak memiliki IAM role, dan lab tidak mengizinkan pembuatan instance atau role baru. Karena itu instance bawaan lab dipakai ulang, dan untuk akses ECR digunakan kredensial sesi sementara yang dihapus (<code>rm ~/.aws/credentials</code>, <code>docker logout</code>) segera setelah image di-pull. Tidak ada access key di kode maupun repositori. Security group hanya membuka port 22 dan 80, jadi API diuji dari dalam instance melalui EC2 Instance Connect.</p>
+
+<div class="fig"><img src="architecture-diagram.png" alt="Diagram arsitektur"></div>
+<p class="cap">Gambar 1. Arsitektur Inventory API pada Track B.</p>
+
+<h2>4. Entitas Data: Item</h2>
+<table>
+  <tr><th style="width:26%">Atribut</th><th style="width:22%">Tipe</th><th>Keterangan</th></tr>
+  <tr><td>itemId</td><td>TEXT (UUID)</td><td>Primary key, dibuat otomatis</td></tr>
+  <tr><td>name</td><td>TEXT</td><td>Wajib, nama barang</td></tr>
+  <tr><td>sku</td><td>TEXT</td><td>Wajib dan unik (duplikat ditolak dengan 409)</td></tr>
+  <tr><td>category</td><td>TEXT</td><td>Opsional, misalnya Elektronik, ATK</td></tr>
+  <tr><td>quantity</td><td>INTEGER</td><td>Wajib, bilangan bulat ≥ 0</td></tr>
+  <tr><td>location</td><td>TEXT</td><td>Opsional, lokasi gudang/rak</td></tr>
+  <tr><td>createdAt, updatedAt</td><td>Timestamp ISO 8601</td><td>Diisi otomatis oleh API</td></tr>
+</table>
+
+<h2>5. Endpoint CRUD</h2>
+<table>
+  <tr><th style="width:13%">Operasi</th><th style="width:40%">Method dan Path</th><th>Respons</th></tr>
+  <tr><td>Create</td><td><code>POST /items</code></td><td>201 dan data baru; 400 jika data kurang/tidak valid; 409 jika SKU sudah ada</td></tr>
+  <tr><td>Read</td><td><code>GET /items</code> dan <code>GET /items/{itemId}</code></td><td>200 dan data; 404 jika tidak ditemukan</td></tr>
+  <tr><td>Update</td><td><code>PUT /items/{itemId}</code></td><td>200 dan data terbaru (mis. quantity, location); 400/404/409</td></tr>
+  <tr><td>Delete</td><td><code>DELETE /items/{itemId}</code></td><td>200 dan pesan konfirmasi; 404 jika tidak ditemukan</td></tr>
+</table>
+
+<h2>6. Bukti Setup AWS</h2>
+<p>Setup awal berhasil: repositori di-clone di EC2, image <code>inventory-service:v1</code> di-build dan di-push ke ECR privat, container dijalankan dari image ECR, dan keempat operasi CRUD sudah diuji dengan <code>scripts/crud-test.sh</code> (termasuk kasus 400 dan 404). Container sempat gagal start karena <code>VOLUME</code> di Dockerfile ditulis sebelum <code>chown</code>, sehingga <code>/data</code> milik root. Ini diatasi dengan mengubah kepemilikan volume di host, dan Dockerfile sudah dibetulkan untuk build berikutnya. Screenshot lengkap ada di folder <code>evidence/</code> di repositori.</p>
+</body></html>
